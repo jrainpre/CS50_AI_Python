@@ -3,6 +3,7 @@ Tic Tac Toe Player
 """
 
 import math
+import copy
 
 X = "X"
 O = "O"
@@ -34,7 +35,7 @@ def player(board):
         for cell in row:
             if cell == X:
                 countX += 1
-            elif cell == 0:
+            elif cell == O:
                 countO += 1
     if countX > countO:
         return O
@@ -87,8 +88,8 @@ def winner(board):
         if row[0] == row[1] == row[2]:
             return row[0]
     for i in range(len(board)):
-        if board[i][0] == board[1] == board[2]:
-            return board[i][0]
+        if board[0][i] == board[1][i] == board[2][i]:
+            return board[0][i]
     if board[0][0] == board[1][1] == board[2][2]:
         return board[0][0]
     if board[2][0] == board[1][1] == board[0][2]:
@@ -102,7 +103,7 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    if winner is not None:
+    if winner(board) is not None:
         return True
     for i in range(len(board)):
         for j in range(len(board[i])):
@@ -127,32 +128,37 @@ def minimax(board):
     """
 
     if player(board) == X:
-        return(maxValue(board))
+        _, action = maxValue(board)
+        return action
     if player(board) == O:
-        return(minValue(board))
+        _, action = minValue(board)
+        return action
+        
     
 
 def maxValue(board):
     v = float('-inf')
-    if terminal():
-        return (utility(board))
+    return_action = None
+    if terminal(board):
+        return (utility(board)), None
     for action in actions(board):
         old_v = v
-        v = max(v, minVlaue(result(board, action)))
-        if old_v != v:
-            old_v = v
-        return_action = action
-    return action
+        temp_v, _ = minValue(result(board, action))
+        if temp_v > v:
+            v = temp_v
+            return_action = action
+    return v, return_action
 
     
 def minValue(board):
     v = float('inf')
-    if terminal():
-        return (utility(board))
+    return_action = None
+    if terminal(board):
+        return (utility(board)), None
     for action in actions(board):
         old_v = v
-        v = min(v, maxVlaue(result(board, action)))
-        if old_v != v:
-            old_v = v
-        return_action = action
-    return action
+        temp_v, _ = maxValue(result(board, action))
+        if temp_v < v:
+            v = temp_v
+            return_action = action
+    return v, return_action
